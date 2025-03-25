@@ -8,50 +8,7 @@ import Enthusiast from "./keys/Enthusiast";
 import Explorer from "./keys/Explorer";
 import Nostalgic from "./keys/Nostalgic";
 
-const GSAP_CONFIG = {
-  moveForward: (position, callback) => {
-    return {
-      z: position[2] + 0.15,
-      x: position[0] - 0.14,
-      duration: 1.5,
-      ease: "elastic.inOut",
-      onComplete: () => {
-        if (callback) callback();
-      },
-    };
-  },
-  moveBackward: (position, callback) => {
-    return {
-      z: position[2],
-      x: position[0],
-      duration: 1.5,
-      ease: "elastic.inOut",
-      onComplete: () => {
-        if (callback) callback();
-      },
-    };
-  },
-  spinRound: (rotationZ, callback) => {
-    return {
-      z: rotationZ + Math.PI * 2,
-      duration: 1.8,
-      ease: "elastic.inOut",
-      onComplete: () => {
-        if (callback) callback();
-      },
-    };
-  },
-  flipBackward: (rotationX, callback) => {
-    return {
-      x: rotationX - Math.PI * 2,
-      duration: 1.8,
-      ease: "elastic.inOut",
-      onComplete: () => {
-        if (callback) callback();
-      },
-    };
-  },
-};
+import { GSAP_CONFIG } from "./config";
 
 const Metal = () => {
   const scratchTexture = useLoader(THREE.TextureLoader, "/scratches.jpg");
@@ -103,7 +60,9 @@ const Key = ({
   position,
   rotation,
   animateKeys,
+  setAnimateKeys,
   setShowOptions,
+  degrade,
 }) => {
   const ref = useRef();
 
@@ -114,13 +73,10 @@ const Key = ({
 
   const handleAnimation = useCallback(() => {
     if (selected === name) {
-      gsap.to(
-        ref.current.position,
-        GSAP_CONFIG.moveForward(position, () => setShowOptions(true))
-      );
+      gsap.to(ref.current.position, GSAP_CONFIG.moveForward(position));
       gsap.to(
         ref.current.rotation,
-        GSAP_CONFIG.spinRound(ref.current.rotation.z)
+        GSAP_CONFIG[name](ref.current.rotation, () => setShowOptions(true))
       );
     } else {
       setShowOptions(false);
@@ -128,12 +84,16 @@ const Key = ({
     }
   }, [name, position, selected, setShowOptions]);
 
-  useFrame(({ clock }) => {
-    if (!animateKeys) return;
-    const time = clock.getElapsedTime();
-    ref.current.position.y = position[1] + Math.cos(time) * 0.02;
-    ref.current.rotation.y = rotation[1] + Math.sin(time) * 0.3;
-  });
+  useEffect(() => {
+    if (!ref.current) return;
+    if (animateKeys) {
+      gsap.to(ref.current.position, GSAP_CONFIG.float(position));
+      gsap.to(ref.current.rotation, GSAP_CONFIG.spin(rotation));
+    } else {
+      gsap.killTweensOf(ref.current.position);
+      gsap.killTweensOf(ref.current.rotation);
+    }
+  }, [animateKeys, position, rotation]);
 
   useEffect(() => {
     handleAnimation();

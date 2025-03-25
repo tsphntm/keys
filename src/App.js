@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { PerformanceMonitor } from "@react-three/drei";
+import {
+  BallCollider,
+  CuboidCollider,
+  Physics,
+  RigidBody,
+  useRopeJoint,
+  useSphericalJoint,
+} from "@react-three/rapier";
 import * as THREE from "three";
 import Controls from "./Controls";
 import Scene from "./Scene";
@@ -18,7 +26,7 @@ const keys = ["enthusiast", "nostalgic", "dreamer"].map(
 console.log(keys);
 
 const App = () => {
-  const [dev, setDev] = useState(true);
+  const [dev, setDev] = useState(false);
   const [degrade, setDegrade] = useState(false);
   const [currentKey, setCurrentKey] = useState(null);
   const [selected, setSelected] = useState(null);
@@ -35,7 +43,7 @@ const App = () => {
   return (
     <div className="app">
       {currentKey && (
-        <>
+        <div className="border">
           <Controls
             keys={keys}
             currentKey={currentKey}
@@ -54,22 +62,24 @@ const App = () => {
             }}
             camera={{ position: [0, 0, 0.6] }}
           >
-            <Scene
-              dev={dev}
-              radius={radius}
-              keys={keys}
-              currentKey={currentKey}
-              selected={selected}
-              degrade={degrade}
-              setShowOptions={setShowOptions}
-            />
+            <Physics>
+              <Scene
+                dev={dev}
+                radius={radius}
+                keys={keys}
+                currentKey={currentKey}
+                selected={selected}
+                degrade={degrade}
+                setShowOptions={setShowOptions}
+              />
+            </Physics>
             <PerformanceMonitor
               onChange={(e) => {
-                setDegrade(e.fps < 50 ? true : false);
+                setDegrade(e.fps < 45 ? true : false);
               }}
             />
           </Canvas>
-        </>
+        </div>
       )}
     </div>
   );

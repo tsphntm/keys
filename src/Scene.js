@@ -55,7 +55,9 @@ const Scene = ({
                 selected={selected}
                 currentKey={currentKey}
                 animateKeys={animateKeys}
+                setAnimateKeys={setAnimateKeys}
                 setShowOptions={setShowOptions}
+                degrade={degrade}
               />
             );
           })}

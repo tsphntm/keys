@@ -1,6 +1,20 @@
 .app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100vw;
   height: 100vh;
+  /* background-color: rgba(100, 215, 181, 1); */
+}
+
+.border {
+  width: 50%;
+  min-width: 500px;
+  height: 90%;
+  border-radius: 50px;
+  box-shadow: 0px 0px 10px grey;
+  overflow: hidden;
+  background-color: white;
 }
 
 .controls {
